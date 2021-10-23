@@ -13,11 +13,11 @@
         </thead>
         <tbody>
             <custom-row v-for="user in flattenUsers" :key="user.name">
-                <td>{{user.name}}</td>
-                <td>{{DateFormat.methods.setDate(user.dob)}}</td>
-                <td>{{user.email}}</td>
-                <td>{{user.phone}}</td>
-                <td><img :src="user.photo" alt="image"></td>
+                <custom-column>{{user.name}}</custom-column>
+                <custom-column>{{DateFormat.methods.setDate(user.dob)}}</custom-column>
+                <custom-column>{{user.email}}</custom-column>
+                <custom-column>{{user.phone}}</custom-column>
+                <custom-column><img :src="user.picture" alt="image"></custom-column>
             </custom-row>
         </tbody>
     </table>
@@ -29,22 +29,25 @@ import { ref, onMounted } from 'vue';
 import userService from '@/services/userService';
 
 import CustomRow from '@/components/CustomRow.vue';
+import CustomColumn from '@/components/CustomColumn.vue';
 import DateFormat from "@/mixins/date-format";
 
-let users: any = ref(null);
-let flattenUsers = ref(new Array<any>());
+import { UserDetail, FlattenUserDetail } from "@/models/model"
+
+let users = ref(new Array<UserDetail>());
+let flattenUsers = ref(new Array<FlattenUserDetail>());
 let sortDir = ref('asc');
 let sortKey = ref('name');
 
 onMounted(async () => {
-    users.value = await userService.getAll().then(res => {  return res });
-    users.value.forEach((userDetail: any) => {
-      const detail = {} as any;
-      detail.name = userDetail.name.first + ' ' + userDetail.name.last;
+    users.value = await userService.getAll().then((res: Array<UserDetail>) => {  return res });
+    users.value.forEach((userDetail: UserDetail) => {
+      const detail = {} as FlattenUserDetail;
+      detail.name =  userDetail.name.first + ' ' + userDetail.name.last;
       detail.phone = userDetail.phone; 
       detail.email = userDetail.email;
       detail.dob = userDetail.dob.date;
-      detail.photo = userDetail.picture.thumbnail;
+      detail.picture = userDetail.picture.thumbnail;
       flattenUsers.value.push(detail);    
     });
     flattenUsers.value = sortByKey(flattenUsers.value, sortKey.value);
@@ -52,7 +55,7 @@ onMounted(async () => {
     console.log(flattenUsers.value);
 })
 
-const sort = (key: any) => {
+const sort = (key: string) => {
   if(sortKey.value == key) {
     flattenUsers.value = flattenUsers.value.reverse();
   } else {
@@ -62,17 +65,11 @@ const sort = (key: any) => {
   sortDir.value = sortDir.value == 'desc' ? 'asc' : 'desc';
 }
 
-const sortByKey = (array: any, key: any) => {
-    return array.sort(function(a: any, b: any) {
-        var x = a[key]; var y = b[key];
+const sortByKey = (array: Array<FlattenUserDetail>, key: string) => {
+    return array.sort(function(a: FlattenUserDetail, b: FlattenUserDetail) {
+        const x = a[key as keyof FlattenUserDetail]; const y = b[key as keyof FlattenUserDetail];
         return ((x < y) ? -1 : ((x > y) ? 1 : 0));
     });
-}
-
-var compareDate = function (u1: any, u2: any) {  
-    var emp1Date = new Date(u1.date).getTime();  
-    var emp2Date = new Date(u2.date).getTime();  
-    return emp1Date > emp2Date ? 1 : -1;    
 }
 </script>
 
