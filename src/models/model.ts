@@ -50,12 +50,27 @@ export interface UserDetail {
     picture: Picture
 }
 
-export interface FlattenUserDetail {
+export class FlattenUserDetail {
     gender: string
     name: string
     email: string
     phone: string
     dob: string
     picture: string
+    constructor(
+        gender: string,
+        name: string,
+        email: string,
+        phone: string,
+        dob: string,
+        picture: string
+    ) {
+        this.gender = gender;
+        this.name = name;
+        this.email = email;
+        this.phone = phone;
+        this.dob = dob;
+        this.picture = picture;
+    }
 }
 
