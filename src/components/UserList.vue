@@ -63,13 +63,16 @@ onMounted(async () => {
 })
 
 const sort = (key: string) => {
+  sortDir.value = sortDir.value == 'desc' ? 'asc' : 'desc';
   if (sortKey.value == key) {
     flattenUsers.value = flattenUsers.value.reverse();
   } else {
     sortKey.value = key;
     flattenUsers.value = sortByKey(flattenUsers.value, key);
+    if(sortDir.value == 'desc' ) {
+      flattenUsers.value = flattenUsers.value.reverse();
+    }
   }
-  sortDir.value = sortDir.value == 'desc' ? 'asc' : 'desc';
 }
 
 const sortByKey = (array: Array<FlattenUserDetail>, key: string) => {
